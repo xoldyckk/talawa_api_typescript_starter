@@ -1,0 +1,12 @@
+node_modules/
+nodemon.json
+.idea/
+.env
+images/
+.vscode
+
+# Added as the documentation only refers to npm, not yarn. 
+yarn.lock
+
+# We don't want to have code coverage data stored in the repo as it is dynamic
+coverage/

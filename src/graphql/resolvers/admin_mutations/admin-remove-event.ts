@@ -1,0 +1,76 @@
+import { User, Organization, Event } from '@talawa-api/models';
+import { NotFoundError } from '@talawa-api/errors';
+import requestContext from '@talawa-api/request-context';
+import adminCheck from '../functions/adminCheck';
+import { MutationResolvers } from '../generatedTypes';
+
+export const adminRemoveEvent: MutationResolvers['adminRemoveEvent'] = async (
+  parent,
+  args,
+  context
+) => {
+  //find event
+  let event = await Event.findOne({ _id: args.eventId });
+  if (!event) {
+    throw new NotFoundError(
+      process.env.NODE_ENV !== 'production'
+        ? 'Event not found'
+        : requestContext.translate('event.notFound'),
+      'event.notFound',
+      'event'
+    );
+  }
+
+  //ensure organization exists
+  let org = await Organization.findOne({ _id: event.organization });
+  if (!org) {
+    throw new NotFoundError(
+      process.env.NODE_ENV !== 'production'
+        ? 'Organization not found'
+        : requestContext.translate('organization.notFound'),
+      'organization.notFound',
+      'organization'
+    );
+  }
+
+  //gets user in token - to be used later on
+  let user = await User.findOne({ _id: context.userId });
+  if (!user) {
+    throw new NotFoundError(
+      process.env.NODE_ENV !== 'production'
+        ? 'User not found'
+        : requestContext.translate('user.notFound'),
+      'user.notFound',
+      'user'
+    );
+  }
+
+  //ensure user is an admin
+  adminCheck(context, org);
+
+  //remove event from user
+  user.overwrite({
+    ...user._doc,
+    eventAdmin: user._doc.eventAdmin.filter(
+      (eventAdmin) => eventAdmin !== event.id
+    ),
+    createdEvents: user._doc.createdEvents.filter(
+      (createdEvent) => createdEvent !== event.id
+    ),
+    registeredEvents: user._doc.registeredEvents.filter(
+      (registeredEvent) => registeredEvent !== event.id
+    ),
+  });
+
+  await user.save();
+
+  //delete post
+  await Event.deleteOne({ _id: args.eventId });
+
+  //return user
+  return {
+    ...event._doc,
+  };
+};
+
+export default adminRemoveEvent;

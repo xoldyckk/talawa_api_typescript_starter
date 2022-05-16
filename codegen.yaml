@@ -1,0 +1,30 @@
+overwrite: true
+schema: 'src/graphql/typeDefs/**/*.ts'
+generates:
+  ./src/graphql/resolvers/generatedTypes.d.ts:
+    plugins:
+      - typescript
+      - typescript-resolvers
+    config:
+      useIndexSignature: true
+      mappers:
+        Chat: '@talawa-api/models#Chat'
+        Comment: '@talawa-api/models#Comment'
+        DirectChat: '@talawa-api/models#DirectChat'
+        DirectChatMessage: '@talawa-api/models#DirectChatMessage'
+        Event: '@talawa-api/models#Event'
+        EventProject: '@talawa-api/models#EventProject'
+        File: '@talawa-api/models#File'
+        Group: '@talawa-api/models#Group'
+        GroupChat: '@talawa-api/models#GroupChat'
+        GroupChatMessage: '@talawa-api/models#GroupChatMessage'
+        ImageHash: '@talawa-api/models#ImageHash'
+        Language: '@talawa-api/models#Language'
+        MembershipRequest: '@talawa-api/models#MembershipRequest'
+        Message: '@talawa-api/models#Message'
+        Organization: '@talawa-api/models#Organization'
+        Plugin: '@talawa-api/models#Plugin'
+        PluginField: '@talawa-api/models#PluginField'
+        Post: '@talawa-api/models#Post'
+        Task: '@talawa-api/models#Task'
+        User: '@talawa-api/models#User'
